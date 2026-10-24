@@ -404,12 +404,14 @@ What has been executed so far, and where:
 
 | Check | Result |
 |---|---|
-| Ruff lint and format check | Passed |
-| Unit tests (`tests/unit`) | 66 passed on Python 3.13 |
-| Pipeline code against a real PostgreSQL 16 server | Run (see below) |
-| PostgreSQL integration tests, `dbt` CLI, SQLFluff, Airflow DAG tests, Docker images | **Not yet run** where the project was assembled (no package index or container registry access there). CI runs all of them on every push. |
+| Ruff lint and format check, SQLFluff | Passed in CI |
+| Unit tests (`tests/unit`, 66 tests) | Passed in CI on Python 3.12 and 3.13 |
+| PostgreSQL integration tests, including `dbt build` and the mart revenue reconciliation | Passed in CI against a PostgreSQL 16 service container |
+| Seven-day pipeline run with `dbt build`, a re-run, and a dirty date that must be blocked | Passed in CI; the generated report is published as the job summary and the `pipeline-report` artifact |
+| Airflow 2.10.4 DAG import and structure tests | Passed in CI |
+| Docker images and the full Compose stack (`make up`, `make demo-failure`) | **Not run yet**; build the stack locally to try the Airflow UI and retry demo |
 
-**Verification run.** The task functions (`ingest_dataset`, `check_raw_quality`, `transform`,
+**Local verification run.** Separately from CI, the task functions (`ingest_dataset`, `check_raw_quality`, `transform`,
 `check_mart_quality`, the report) were executed against a local PostgreSQL 16 server for logical
 dates 2026-01-01 to 2026-01-09. Because no PostgreSQL driver could be installed in that
 environment, a small test-only adapter sent the statements through `psql`, and the dbt models
