@@ -1,0 +1,15 @@
+version: 2
+
+sources:
+  - name: raw
+    description: Validated daily partitions written by the Python ingestion layer. Synthetic data.
+    schema: raw
+    tables:
+      - name: customers
+        description: One row per customer per logical date the customer appeared in a source file.
+      - name: products
+        description: One row per product per logical date the product was created or repriced.
+      - name: orders
+        description: One row per order per logical date.
+      - name: payments
+        description: One row per payment event per logical date.

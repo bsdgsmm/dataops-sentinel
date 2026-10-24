@@ -1,0 +1,18 @@
+version: 2
+
+models:
+  - name: int_order_payments
+    description: Payment events aggregated to one row per order.
+    columns:
+      - name: order_id
+        tests: [unique, not_null]
+      - name: net_paid_amount
+        description: Captured amount minus refunded amount. Failed attempts are excluded.
+
+  - name: int_orders_enriched
+    description: Orders joined with product, customer and payment information.
+    columns:
+      - name: order_id
+        tests: [unique, not_null]
+      - name: is_revenue_order
+        description: True unless the order status is cancelled.

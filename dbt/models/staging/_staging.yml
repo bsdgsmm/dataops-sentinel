@@ -1,0 +1,77 @@
+version: 2
+
+models:
+  - name: stg_customers
+    description: Latest known version of every customer.
+    columns:
+      - name: customer_id
+        description: Business key, format C00000.
+        tests: [unique, not_null]
+      - name: email
+        tests: [not_null]
+      - name: country
+        description: ISO 3166-1 alpha-2 country code.
+        tests:
+          - not_null
+          - accepted_values:
+              values: ["DE", "FR", "NL", "ES", "IT", "TR", "PL", "SE"]
+
+  - name: stg_products
+    description: Latest known version of every product, including its current price.
+    columns:
+      - name: product_id
+        tests: [unique, not_null]
+      - name: current_unit_price
+        tests: [not_null]
+
+  - name: stg_orders
+    description: Latest version of every order. One product line per order.
+    columns:
+      - name: order_id
+        tests: [unique, not_null]
+      - name: customer_id
+        description: Unknown customers are allowed through ingestion and limited by the raw quality gate, so this test warns instead of failing.
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_customers')
+              field: customer_id
+              config:
+                severity: warn
+      - name: product_id
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_products')
+              field: product_id
+              config:
+                severity: warn
+      - name: order_status
+        tests:
+          - not_null
+          - accepted_values:
+              values: ["placed", "shipped", "delivered", "cancelled"]
+      - name: order_date
+        description: UTC calendar date of ordered_at.
+        tests: [not_null]
+
+  - name: stg_payments
+    description: Latest version of every payment event.
+    columns:
+      - name: payment_id
+        tests: [unique, not_null]
+      - name: order_id
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_orders')
+              field: order_id
+              config:
+                severity: warn
+      - name: payment_status
+        tests:
+          - not_null
+          - accepted_values:
+              values: ["captured", "refunded", "failed"]
+      - name: amount
+        tests: [not_null]

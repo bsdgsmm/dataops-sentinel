@@ -1,0 +1,52 @@
+version: 2
+
+models:
+  - name: fct_daily_revenue
+    description: >
+      One row per UTC order date. Revenue is attributed to the date the order
+      was placed, not the date the money moved.
+    columns:
+      - name: order_date
+        tests: [unique, not_null]
+      - name: orders_count
+        description: All orders placed on the date, including cancelled ones.
+      - name: gross_order_value
+        description: Sum of order_total for orders that are not cancelled.
+      - name: captured_amount
+        description: Sum of captured payments for orders placed on the date.
+      - name: refunded_amount
+        description: Sum of refunds for orders placed on the date.
+      - name: net_revenue
+        description: captured_amount minus refunded_amount.
+        tests: [not_null]
+      - name: average_order_value
+        description: net_revenue divided by the number of non-cancelled orders.
+      - name: active_customers
+        description: Distinct customers who placed at least one order on the date.
+
+  - name: mart_product_performance
+    description: Lifetime sales metrics per product.
+    columns:
+      - name: product_id
+        tests: [unique, not_null]
+      - name: units_sold
+        description: Quantity on non-cancelled orders.
+      - name: net_revenue
+        description: Net paid amount (captured minus refunded) across the product's orders.
+      - name: cancellation_rate
+        description: Cancelled orders divided by all orders for the product.
+
+  - name: mart_customer_order_activity
+    description: Order activity per known customer, including customers without orders.
+    columns:
+      - name: customer_id
+        tests:
+          - unique
+          - not_null
+          - relationships:
+              to: ref('stg_customers')
+              field: customer_id
+      - name: lifetime_net_revenue
+        description: Net paid amount across all of the customer's orders.
+      - name: days_since_last_order
+        description: Days between the customer's last order and the latest order date in the data.
