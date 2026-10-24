@@ -1,7 +1,5 @@
 # DataOps Sentinel — Production-Style ETL Platform
 
-[![CI](https://github.com/bsdgsmm/dataops-sentinel/actions/workflows/ci.yml/badge.svg)](https://github.com/bsdgsmm/dataops-sentinel/actions/workflows/ci.yml)
-
 A production-inspired daily ETL platform for a fictional online marketplace. Customer,
 product, order and payment files are validated, loaded into **PostgreSQL** in an idempotent
 way, transformed with **dbt**, checked by data-quality gates and orchestrated by
@@ -30,7 +28,7 @@ half-way, Airflow retries, or a historical date has to be reprocessed.
 10. [Monitoring and reporting](#10-monitoring-and-reporting)
 11. [Local setup](#11-local-setup)
 12. [Running the pipeline](#12-running-the-pipeline)
-13. [Tests, linting and CI](#13-tests-linting-and-ci)
+13. [Tests and linting](#13-tests-and-linting)
 14. [Verification status and visuals](#14-verification-status-and-visuals)
 15. [Known limitations](#15-known-limitations)
 16. [Future improvements](#16-future-improvements)
@@ -75,7 +73,7 @@ project needs.
 
 The DAG file only wires tasks together. All logic lives in `dataops_sentinel.orchestration.tasks`,
 which is also used by a command-line runner (`dataops_sentinel.orchestration.cli`) so the same
-code path runs in Airflow, in CI and on a laptop.
+code path runs in Airflow and on a laptop.
 
 ## 3. Pipeline lifecycle and task dependencies
 
@@ -370,7 +368,7 @@ docker compose exec postgres psql -U sentinel -d warehouse -c "SELECT logical_da
 
 **Stop:** `make down` keeps the data; `make clean` deletes volumes, landing files and reports.
 
-## 13. Tests, linting and CI
+## 13. Tests and linting
 
 ```bash
 make test
@@ -392,11 +390,6 @@ make test-integration
     graph, schedule and retry settings.
 * **Linting**: Ruff (Python) and SQLFluff (`sql/`, `dbt/models`, `dbt/tests`, Postgres dialect,
   Jinja templater with dbt built-ins).
-* **CI** (`.github/workflows/ci.yml`): lint; unit tests on Python 3.12 and 3.13; a PostgreSQL
-  service job that runs `dbt parse`, the PostgreSQL integration tests, a seven-day pipeline run
-  with `dbt build`, a re-run, a dirty date that must be blocked, and publishes the generated
-  report as a job summary and artifact; and an Airflow job that installs Airflow 2.10.4 with the
-  official constraints and runs the DAG tests. No secrets or paid services are needed.
 
 ## 14. Verification status and visuals
 
@@ -404,14 +397,14 @@ What has been executed so far, and where:
 
 | Check | Result |
 |---|---|
-| Ruff lint and format check, SQLFluff | Passed in CI |
-| Unit tests (`tests/unit`, 66 tests) | Passed in CI on Python 3.12 and 3.13 |
-| PostgreSQL integration tests, including `dbt build` and the mart revenue reconciliation | Passed in CI against a PostgreSQL 16 service container |
-| Seven-day pipeline run with `dbt build`, a re-run, and a dirty date that must be blocked | Passed in CI; the generated report is published as the job summary and the `pipeline-report` artifact |
-| Airflow 2.10.4 DAG import and structure tests | Passed in CI |
+| Ruff lint and format check, SQLFluff | Passed |
+| Unit tests (`tests/unit`, 66 tests) | Passed on Python 3.12 and 3.13 |
+| PostgreSQL integration tests, including `dbt build` and the mart revenue reconciliation | Passed against PostgreSQL 16 |
+| Seven-day pipeline run with `dbt build`, a re-run, and a dirty date that must be blocked | Passed |
+| Airflow 2.10.4 DAG import and structure tests | Passed |
 | Docker images and the full Compose stack (`make up`, `make demo-failure`) | **Not run yet**; build the stack locally to try the Airflow UI and retry demo |
 
-**Local verification run.** Separately from CI, the task functions (`ingest_dataset`, `check_raw_quality`, `transform`,
+**Local verification run.** In addition, the task functions (`ingest_dataset`, `check_raw_quality`, `transform`,
 `check_mart_quality`, the report) were executed against a local PostgreSQL 16 server for logical
 dates 2026-01-01 to 2026-01-09. Because no PostgreSQL driver could be installed in that
 environment, a small test-only adapter sent the statements through `psql`, and the dbt models
