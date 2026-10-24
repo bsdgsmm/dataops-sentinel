@@ -1,0 +1,50 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "dataops-sentinel"
+version = "0.1.0"
+description = "Production-inspired daily ETL platform: validated ingestion into PostgreSQL, dbt transformations, data-quality gates and Airflow orchestration."
+readme = "README.md"
+requires-python = ">=3.12"
+license = { text = "MIT" }
+dependencies = [
+    "psycopg[binary]>=3.2,<4",
+]
+
+[project.optional-dependencies]
+dbt = [
+    "dbt-postgres>=1.8,<1.9",
+]
+report = [
+    "matplotlib>=3.9,<4",
+]
+dev = [
+    "pytest>=8.3,<10",
+    "ruff>=0.6",
+    "sqlfluff>=3.2,<4",
+]
+
+[project.scripts]
+sentinel-generate = "dataops_sentinel.synthetic.generator:main"
+sentinel-run = "dataops_sentinel.orchestration.cli:main"
+sentinel-report = "dataops_sentinel.reporting.report:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src", "."]
+markers = [
+    "integration: requires PostgreSQL (set SENTINEL_RUN_INTEGRATION=1)",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+src = ["src", "tests", "scripts", "dags"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "SIM", "T20", "RUF"]
