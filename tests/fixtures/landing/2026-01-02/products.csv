@@ -1,0 +1,3 @@
+product_id,product_name,category,unit_price,updated_at
+P0001,Product 0001,home,19.99,2026-01-02T00:10:00Z
+P0002,Product 0002,books,abc,2026-01-02T00:10:00Z

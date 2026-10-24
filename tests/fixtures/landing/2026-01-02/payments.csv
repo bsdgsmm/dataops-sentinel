@@ -1,0 +1,4 @@
+payment_id,order_id,amount,method,status,paid_at
+PAY00000001,O00000001,39.98,card,captured,2026-01-02T10:20:00Z
+PAY00000002,O00000009,19.99,wallet,captured,2026-01-03T00:30:00Z
+PAY00000003,O00000001,-5.00,card,refunded,2026-01-02T11:00:00Z

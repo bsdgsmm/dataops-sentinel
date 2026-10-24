@@ -1,0 +1,2 @@
+order_id,customer_id,product_id,quantity,unit_price,order_total,ordered_at
+O00000010,C00001,P0001,1,19.99,19.99,2026-01-03T09:00:00Z

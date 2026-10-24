@@ -1,0 +1,5 @@
+customer_id,email,full_name,country,created_at
+C00001,alex.berg1@example.com,Alex Berg,DE,2026-01-02T08:00:00Z
+C00002,,Sam Novak,FR,2026-01-02T09:00:00Z
+C00003,kim.silva3@example.com,Kim Silva,XX,2026-01-02T10:00:00Z
+C00001,alex.berg1@example.com,Alex Berg,DE,2026-01-02T08:00:00Z
