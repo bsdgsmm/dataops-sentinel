@@ -1,0 +1,121 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1120 620" font-family="Helvetica, Arial, sans-serif" role="img" aria-label="DataOps Sentinel architecture">
+  <title>DataOps Sentinel architecture</title>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#334155"/>
+    </marker>
+    <marker id="r" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#dc2626"/>
+    </marker>
+    <style>
+      .box { fill: #fff; stroke: #334155; stroke-width: 1.5; }
+      .gate { fill: #fff7ed; stroke: #c2410c; stroke-width: 1.5; }
+      .zone { fill: #f8fafc; stroke: #cbd5e1; stroke-dasharray: 5 4; }
+      .h { font-size: 14px; font-weight: 700; fill: #0f172a; }
+      .t { font-size: 12px; fill: #334155; }
+      .s { font-size: 11px; fill: #64748b; }
+      .f { stroke: #334155; stroke-width: 1.7; fill: none; marker-end: url(#a); }
+      .x { stroke: #dc2626; stroke-width: 1.7; fill: none; marker-end: url(#r); }
+    </style>
+  </defs>
+  <rect width="1120" height="620" fill="#fff"/>
+  <text x="28" y="36" class="h" font-size="20">DataOps Sentinel - daily ETL with quality gates (Docker Compose stack)</text>
+
+  <rect x="20" y="58" width="1080" height="300" rx="10" class="zone"/>
+  <text x="34" y="80" class="s">Airflow DAG dataops_sentinel_daily - LocalExecutor, schedule 0 2 * * * UTC, retries 2 with exponential backoff, max_active_runs 1</text>
+
+  <rect x="36" y="100" width="130" height="70" rx="8" class="box"/>
+  <text x="48" y="124" class="h">prepare_run</text>
+  <text x="48" y="144" class="s">ensure schema</text>
+  <text x="48" y="159" class="s">audit.pipeline_runs</text>
+
+  <rect x="186" y="100" width="140" height="70" rx="8" class="box"/>
+  <text x="198" y="124" class="h">land_source_files</text>
+  <text x="198" y="144" class="s">synthetic CSVs per</text>
+  <text x="198" y="159" class="s">logical date</text>
+
+  <rect x="350" y="92" width="170" height="190" rx="8" class="box"/>
+  <text x="362" y="116" class="h">ingest_* (x4)</text>
+  <text x="362" y="138" class="t">customers, products,</text>
+  <text x="362" y="154" class="t">orders, payments</text>
+  <text x="362" y="178" class="s">header contract check</text>
+  <text x="362" y="194" class="s">row validation + rejects</text>
+  <text x="362" y="210" class="s">duplicate keys in file</text>
+  <text x="362" y="232" class="s">one transaction:</text>
+  <text x="362" y="248" class="s">delete partition, insert,</text>
+  <text x="362" y="264" class="s">rejects, batch audit</text>
+
+  <rect x="544" y="100" width="160" height="110" rx="8" class="gate"/>
+  <text x="556" y="124" class="h">quality_raw</text>
+  <text x="556" y="144" class="s">reject rate, FK orphans,</text>
+  <text x="556" y="159" class="s">duplicate keys, row counts,</text>
+  <text x="556" y="174" class="s">order value vs payments</text>
+  <text x="556" y="196" class="s">blocking vs warning</text>
+
+  <rect x="722" y="100" width="124" height="110" rx="8" class="box"/>
+  <text x="732" y="124" class="h">dbt_build</text>
+  <text x="732" y="144" class="s">staging views</text>
+  <text x="732" y="159" class="s">intermediate views</text>
+  <text x="732" y="174" class="s">mart tables</text>
+  <text x="732" y="196" class="s">+ dbt tests</text>
+
+  <rect x="864" y="100" width="118" height="110" rx="8" class="gate"/>
+  <text x="872" y="124" class="h" font-size="13">quality_marts</text>
+  <text x="872" y="144" class="s">mart row exists</text>
+  <text x="872" y="159" class="s">net revenue raw</text>
+  <text x="872" y="174" class="s">= mart (exact)</text>
+
+  <rect x="996" y="100" width="96" height="110" rx="8" class="box"/>
+  <text x="1004" y="124" class="h" font-size="13">finalize_run</text>
+  <text x="1004" y="144" class="s">all_done</text>
+  <text x="1004" y="159" class="s">run status</text>
+  <text x="1004" y="174" class="s">Markdown</text>
+  <text x="1004" y="189" class="s">report</text>
+
+  <path d="M166,135 L184,135" class="f"/>
+  <path d="M326,135 L348,135" class="f"/>
+  <path d="M520,155 L542,155" class="f"/>
+  <path d="M704,155 L720,155" class="f"/>
+  <path d="M846,155 L862,155" class="f"/>
+  <path d="M982,155 L994,155" class="f"/>
+  <text x="556" y="250" class="s" fill="#dc2626">blocking fail: AirflowFailException,</text>
+  <text x="556" y="265" class="s" fill="#dc2626">no retry, downstream skipped</text>
+  <text x="556" y="290" class="s">transient DB / dbt errors: retried</text>
+  <path d="M600,210 L600,236" class="x"/>
+
+  <rect x="20" y="380" width="1080" height="220" rx="10" class="zone"/>
+  <text x="34" y="402" class="s">PostgreSQL 16 - database "warehouse" (Airflow metadata lives in a separate "airflow" database on the same server)</text>
+
+  <rect x="40" y="420" width="250" height="160" rx="8" class="box"/>
+  <text x="52" y="444" class="h">raw</text>
+  <text x="52" y="466" class="t">customers, products, orders,</text>
+  <text x="52" y="482" class="t">payments</text>
+  <text x="52" y="502" class="s">PK (logical_date, business key)</text>
+  <text x="52" y="522" class="t">rejected_records</text>
+  <text x="52" y="538" class="s">reasons[], messages[], raw JSON</text>
+
+  <rect x="320" y="420" width="250" height="160" rx="8" class="box"/>
+  <text x="332" y="444" class="h">staging / intermediate</text>
+  <text x="332" y="466" class="t">stg_* : latest version per key</text>
+  <text x="332" y="486" class="t">int_order_payments</text>
+  <text x="332" y="506" class="t">int_orders_enriched</text>
+
+  <rect x="600" y="420" width="230" height="160" rx="8" class="box"/>
+  <text x="612" y="444" class="h">marts</text>
+  <text x="612" y="466" class="t">fct_daily_revenue</text>
+  <text x="612" y="486" class="t">mart_product_performance</text>
+  <text x="612" y="506" class="t">mart_customer_order_activity</text>
+
+  <rect x="860" y="420" width="220" height="160" rx="8" class="box"/>
+  <text x="872" y="444" class="h">audit</text>
+  <text x="872" y="466" class="t">pipeline_runs</text>
+  <text x="872" y="486" class="t">task_runs (every attempt)</text>
+  <text x="872" y="506" class="t">ingestion_batches</text>
+  <text x="872" y="526" class="t">quality_results</text>
+
+  <path d="M435,282 L200,418" class="f"/>
+  <path d="M290,500 L318,500" class="f"/>
+  <path d="M570,500 L598,500" class="f"/>
+  <path d="M780,210 L700,418" class="f"/>
+  <path d="M1044,210 L990,418" class="f"/>
+</svg>
